@@ -11,3 +11,5 @@ services:
     entrypoint: ["/hp-throttling"]
     environment:
       IN_SOCKET: "/tmp/hp"
+      THROTTLE_LIMIT: "100"
+      THROTTLE_BURST: "100"
