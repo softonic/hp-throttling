@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: softonic/hp-pass-middleware:0.1.0
-    entrypoint: ["/pass-middleware"]
+    image: softonic/hp-throttling:0.1.0
+    entrypoint: ["/hp-throttling"]
     environment:
       IN_SOCKET: "/tmp/hp"

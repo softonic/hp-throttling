@@ -1,4 +1,4 @@
-# HP Passthrough Middleware
+# HP throttling Middleware
 
 [Homing pigeon](https://github.com/softonic/homing-pigeon) middleware that just pass the data.
 

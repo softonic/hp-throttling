@@ -1,11 +1,11 @@
-FROM golang:1.13-buster AS build
+FROM golang:1.23-bookworm AS build
 
-COPY ./ /go/src/github.com/softonic/hp-passthrough
+COPY ./ /go/src/github.com/softonic/hp-throttling
 
-RUN cd /go/src/github.com/softonic/hp-passthrough && make build
+RUN cd /go/src/github.com/softonic/hp-throttling && make build
 
 FROM scratch
 
-COPY --from=build /go/src/github.com/softonic/hp-passthrough/bin/hp-passthrough /
+COPY --from=build /go/src/github.com/softonic/hp-throttling/bin/hp-throttling /
 
-ENTRYPOINT ["/hp-passthrough", "-logtostderr"]
+ENTRYPOINT ["/hp-throttling", "-logtostderr"]
