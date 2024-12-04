@@ -1,29 +1,36 @@
-# HP Passthrough Middleware
+# HP throttling Middleware
 
-[Homing pigeon](https://github.com/softonic/homing-pigeon) middleware that just pass the data.
+[Homing pigeon](https://github.com/softonic/homing-pigeon) middleware that throttles messages to limit writes.
 
 ### Overview
 
-This dummy middleware can be used as base middleware to do your own implementations.
-
-### Requirements
-
-All the [Homing pigeon](https://github.com/softonic/homing-pigeon) middlewares must accept at least the next env vars.
-
-| Name       | Description                                | Example                                                                              |
-| ---------- | ------------------------------------------ | ------------------------------------------------------------------------------------ |
-| IN_SOCKET  | Socket where the data will be received     | `"/sockets/input.sock"`                                                              |
-| OUT_SOCKET | Socket to send data to the next middleware | `"passthrough:///unix:///sockets/input.sock"` or `""` if this is the last middleware |
+This middleware is a simple implementation of a throttling middleware. It will limit the number of messages per second that can be sent to the next middleware, allowing for
+burst usage.
 
 ### How it works
 
-The middleware receives a `github.com/softonic/homing-pigeon/middleware` message as request in the `IN_SOCKET`, so you can
-modify the input data to send it to the next middlewares. After the next middlewares are executed, it intercepts the response
-so it can be modified again before it is finally returned.
+The middleware uses the `rate` library of Go to implement throttling and burst functionality. This means that you can configure the number of messages allowed per second, as well as the ability to
+handle occasional bursts of traffic. The configuration is done according to the documentation provided by the [`rate` library](https://pkg.go.dev/golang.org/x/time/rate).
 
-The main homing-pigeon package come with an `UnimplementedMiddleware` to allow you to implement just the middleware bussiness logic. If you need
-more control, you can implement your middleware from scratch. Take a look at `UnimplementedMiddleware` to know the basic implementation.
+- **Limit**: This defines the rate at which events are allowed. It's expressed in events per second. If you set a `Limit` of 5, you are allowing 5 events to occur per second. If the value is set to 0,
+  throttling is disabled.
+
+- **Burst**: This is the maximum number of events that are allowed to burst beyond the `Limit` in a short period. Even if the rate is controlled by the `Limit`, a burst allows occasional bursts of
+  event traffic greater than the normal rate.
 
 ### Usage
 
-You just need to execute the binary or use docker to automatically run it. If you want to show some logging in the output, you can use the [kglog](https://github.com/kubernetes/klog) flags in the command.
+If you are using the [homing-pigeon-chart](https://github.com/softonic/homing-pigeon-chart/) Helm chart, you can enable the throttling middleware by setting the following values in the `values.yaml` file:
+
+```yaml
+requestMiddlewares:
+ - name: throttling
+   repository: softonic/hp-throttling
+   tag: latest
+   pullPolicy: IfNotPresent
+   env:
+   - name: THROTTLE_LIMIT
+     value: "100"
+   - name: THROTTLE_BURST
+     value: "100"
+```

@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  hp-middleware-throttling:
+    volumes:
+      - ./sockets:/tmp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: softonic/hp-throttling:0.1.0
+    entrypoint: ["/hp-throttling"]
+    environment:
+      IN_SOCKET: "/tmp/hp"
+      THROTTLE_LIMIT: "100"
+      THROTTLE_BURST: "100"
